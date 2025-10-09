@@ -19,6 +19,7 @@ public class HTTPServer {
                 PrintWriter writer = new PrintWriter(new OutputStreamWriter(client.getOutputStream())); // Write data to the client
                 Request request = new Request(reader);
                 System.out.println(request.getBody());
+                Router.route(request);
                 writer.write(Response.getResponse(request.getMethod(), "200"));
                 writer.flush();
                 writer.close();

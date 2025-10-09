@@ -2,7 +2,6 @@ package utils;
 
 import classes.Library;
 import classes.users.User;
-import com.mysql.cj.callback.UsernameCallback;
 
 import java.sql.Connection;
 import java.util.Scanner;
