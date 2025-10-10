@@ -2,10 +2,12 @@ package server;
 
 import handlers.UserHandler;
 
+import java.sql.Connection;
+
 public class Router {
 
 
-    public static void route(Request req) {
+    public static void route(Request req, Connection conn) {
 
         if (!(req.getMethod().equalsIgnoreCase("OPTIONS"))) {
 
@@ -13,7 +15,7 @@ public class Router {
 
                 case "/login":
 
-                    UserHandler.handleLogin(req);
+                    UserHandler.handleLogin(req, conn);
                     break;
 
                 case "/register":
