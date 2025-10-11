@@ -1,6 +1,8 @@
 package server;
 
 import classes.Library;
+import classes.users.User;
+import utils.SessionResult;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -8,6 +10,7 @@ import java.net.Socket;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Scanner;
+import java.util.UUID;
 
 
 public class HTTPServer {
@@ -15,14 +18,14 @@ public class HTTPServer {
     private final static String CONN_STRING = "jdbc:mysql://localhost:3306/music";
     private final static String USER = "root";
     private final static Library library = new Library("MyLibrary");
+    private final static SessionManager sessionManager = new SessionManager();
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Provide password to library database: ");
+        System.out.println("Provide password to db: ");
         String password = scanner.nextLine();
-
+        User user = null;
         try (Connection connection = DriverManager.getConnection(CONN_STRING, USER, password)) {
 
             try (ServerSocket serverSocket = new ServerSocket(9000)) {
@@ -35,10 +38,21 @@ public class HTTPServer {
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(client.getOutputStream())); // Write data to the client
                     Request request = new Request(reader);
                     System.out.println(request.getBody());
-                    Router.route(request, connection);
-                    writer.write(Response.getResponse(request.getMethod(), "200"));
+
+                    if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
+                        writer.write(Response.getResponse(request, "200"));
+                    } else {
+                        SessionResult sessionResult = sessionManager.handleSession(request, connection);
+                        System.out.println(sessionResult.user().toString());
+                        if (request.getPath().equalsIgnoreCase("/login")) {
+                            writer.write(Response.successfulLogin(request, sessionResult.uuid()));
+                        } else {
+                            Router.route(request, connection);
+                            writer.write(Response.getResponse(request, "200"));
+                        }
+                    }
+
                     writer.flush();
-                    writer.close();
                     client.close();
                     reader.close();
 
@@ -46,7 +60,7 @@ public class HTTPServer {
 
             } catch (Exception e) {
 
-                e.getStackTrace();
+                e.printStackTrace();
 
             }
 
@@ -55,6 +69,7 @@ public class HTTPServer {
 
             throw new RuntimeException(e);
         }
+
         }
 
 

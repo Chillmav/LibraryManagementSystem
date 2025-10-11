@@ -4,6 +4,7 @@ import classes.users.Reader;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.UUID;
 
 public class Request {
 
@@ -11,6 +12,7 @@ public class Request {
     private String path;
     private String headers;
     private String body;
+    private UUID userId;
 
     public Request(BufferedReader reader) {
 
@@ -20,7 +22,13 @@ public class Request {
             if(status) {
 
                 String[] methodAndPath = extractMethodAndPath(reader);
-                String[] headersAndBody = extractHeadersAndBody(reader);
+                String[] headersAndBody = extractHeadersBodyAndCookies(reader);
+                String userIdStr = headersAndBody[2];
+                if (userIdStr != null && !userIdStr.isEmpty()) {
+                    this.userId = UUID.fromString(userIdStr);
+                } else {
+                    this.userId = null; // no session yet
+                }
 
                 this.method = methodAndPath[0];
                 this.path = methodAndPath[1];
@@ -28,17 +36,20 @@ public class Request {
                 this.body = headersAndBody[1];
 
             }
+
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
     }
 
-    private String[] extractHeadersAndBody(BufferedReader reader) throws IOException {
+    private String[] extractHeadersBodyAndCookies(BufferedReader reader) throws IOException {
 
         StringBuilder headers = new StringBuilder();
         String line;
         String body;
+        String userId = "";
+
         int bodyLength = 0;
         while ((line = reader.readLine()) != null && !line.isEmpty()) {
 
@@ -49,13 +60,21 @@ public class Request {
 
 
             }
+
+            if (line.startsWith("Cookie:")) {
+
+                userId = line.substring(line.indexOf("SESSIONID=") + 10).trim();
+
+
+
+            }
         }
 
         char[] bodyChars = new char[bodyLength];
         reader.read(bodyChars, 0, bodyLength);
 
 
-        return new String[]{String.valueOf(headers), String.valueOf(bodyChars)};
+        return new String[]{String.valueOf(headers), String.valueOf(bodyChars), userId};
     }
 
     private String[] extractMethodAndPath(BufferedReader reader) throws IOException{
@@ -95,4 +114,6 @@ public class Request {
     public String getBody() {
         return body;
     }
+
+    public UUID getUserId() {return userId;}
 }

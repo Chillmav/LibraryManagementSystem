@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class UserHandler {
 
-    public static void handleLogin(Request req, Connection conn) {
+    public static User handleLogin(Request req, Connection conn) {
 
 
         String body = req.getBody();
@@ -24,22 +24,18 @@ public class UserHandler {
             System.out.println(email);
             System.out.println(password);
 
-            User user = Library.verifyUser(conn, email, password);
+            return Library.verifyUser(conn, email, password);
 
-            System.out.println(user.getRole().toString());
 
 
         } catch (Exception e) {
-
+            e.getStackTrace();
         }
 
-
+        return null;
     }
 
     public static void handleRegister(Request req) {
-
-
         String body = req.getBody();
-
     }
 }
