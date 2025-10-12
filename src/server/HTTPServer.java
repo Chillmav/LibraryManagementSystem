@@ -1,6 +1,7 @@
 package server;
 
 import classes.Library;
+import classes.Role;
 import classes.users.User;
 import utils.SessionResult;
 
@@ -42,14 +43,18 @@ public class HTTPServer {
                     if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
                         writer.write(Response.getResponse(request, "200"));
                     } else {
+
                         SessionResult sessionResult = sessionManager.handleSession(request, connection);
-                        System.out.println(sessionResult.user().toString());
-                        if (request.getPath().equalsIgnoreCase("/login")) {
-                            writer.write(Response.successfulLogin(request, sessionResult.uuid()));
-                        } else {
-                            Router.route(request, connection);
-                            writer.write(Response.getResponse(request, "200"));
+                        if (sessionResult != null) {
+                            user = sessionResult.user();
+                            if (request.getPath().equalsIgnoreCase("/login")) {
+                                writer.write(Response.successfulLogin(request, sessionResult.uuid()));
+                            } else {
+                                Router.route(request, connection);
+                                writer.write(Response.getResponse(request, "200"));
+                            }
                         }
+
                     }
 
                     writer.flush();

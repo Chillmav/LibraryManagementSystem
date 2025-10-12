@@ -1,27 +1,40 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function LoginComponent() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loginError, setLoginError] = useState(false);
+
+
+    useEffect(() => {
+        setLoginError(false);
+    }, []);
+
+
+    const navigate = useNavigate();
 
     async function handlelogin() {
 
-
-        let smth = await fetch("http://localhost:9000/login", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-                email,
-                password
-            })
-        });
-
-        console.log("Email: " + email + ", Password: " + password);
-        console.log(smth.json.body);
-        
+        await fetch("http://localhost:9000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            if (data.status === "success") {
+            navigate("panel");
+            } else {
+            setLoginError(true);
+            }
+        })
+        .catch(err => {
+            setLoginError(true);
+            console.error(err);
+        });   
     }
 
     return (
@@ -36,6 +49,8 @@ function LoginComponent() {
                 onClick={handlelogin}
                 >Login
                 </button>
+                {loginError ? <p className='text-2xl text-red-400'>Something went wrong, try again.
+                </p> : <></>}
                 </div>
                 <div className="bg-gray-500 min-w-[450px] h-[1px] mt-10"></div>
                 <button className="mt-15 border-2 rounded-md min-w-[400px] py-5 px-3 text-[25px] bg-green-600 border-green-600 cursor-pointer text-white">Create new account</button>

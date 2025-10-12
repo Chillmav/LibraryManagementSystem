@@ -24,13 +24,15 @@ public class Response {
 
         } else if (method.equalsIgnoreCase("POST")) {
 
+            String body = "{\"message\":\"" + message + "\"}";
+            int content_length = body.getBytes(StandardCharsets.UTF_8).length;
             return "HTTP/1.1 " + status + " OK\r\n" +
                     "Content-Type: application/json\r\n" +
                     "Access-Control-Allow-Origin: *\r\n" +
                     "Connection: close\r\n" +
-                    "Content-Length: 0\r\n" +
+                    "Content-Length: " + content_length +"\r\n" +
                     "\r\n" +
-                    "{\"message\":\"" + message + "\"}";
+                    body;
 
         } else {
             return "";
