@@ -27,12 +27,11 @@ public class SessionManager {
             sessionIdMap.put(uuid1, user);
             return new SessionResult(user, uuid1);
 
-
-
         }
-
 
     }
 
-
+    public ConcurrentHashMap<UUID, User> getSessionIdMap() {
+        return sessionIdMap;
+    }
 }

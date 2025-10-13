@@ -63,11 +63,17 @@ public class Request {
 
             if (line.startsWith("Cookie:")) {
 
-                userId = line.substring(line.indexOf("SESSIONID=") + 10).trim();
-
-
-
+                String[] cookies = line.substring("Cookie:".length()).split(";");
+                for (String cookie : cookies) {
+                    cookie = cookie.trim();
+                    if (cookie.startsWith("SESSIONID=")) {
+                        userId = cookie.substring("SESSIONID=".length()).trim();
+                        break;
+                    }
+                }
             }
+
+
         }
 
         char[] bodyChars = new char[bodyLength];

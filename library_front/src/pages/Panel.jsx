@@ -3,13 +3,27 @@ import Books from "../components/Books";
 
 function Panel() {
 
-    const [booksOption, setBooksOption] = useState("all"); // yours is second choice
+    const [booksOption, setBooksOption] = useState("all"); // user is second choice
     const [page, setPage] = useState(1);
-
+    const [books, setBooks] = useState([]);
+    
 
     useEffect(() => {
+        
+        if (booksOption === "all") {
+            
+            fetch("http://localhost:9000/library_books", {
+            method: "GET",
+            credentials: "include", 
+            }).then(res => res.json()).then(data => console.log(data)).catch(error => console.error(error));
 
-    })
+        } else if (booksOption === "yours") {
+
+        }
+
+
+    }, [booksOption])
+
     return (
 
     <div className="bg-white w-[60vw] h-[70vh] rounded-2xl shadow-xl flex  flex-col absolute">

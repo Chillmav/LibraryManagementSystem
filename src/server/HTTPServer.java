@@ -24,7 +24,7 @@ public class HTTPServer {
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Provide password to db: "); //haslodb
+        System.out.println("Provide password to db: "); // haslodb
         String password = scanner.nextLine();
         try (Connection connection = DriverManager.getConnection(CONN_STRING, USER, password)) {
 
@@ -37,12 +37,10 @@ public class HTTPServer {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));  // Read data from the input stream (from a client)
                     PrintWriter writer = new PrintWriter(new OutputStreamWriter(client.getOutputStream())); // Write data to the client
                     Request request = new Request(reader);
-//                    System.out.println(request.getBody());
-
 
                     String responseMessage = Router.route(request, connection, sessionManager);
-                    writer.write(responseMessage);
 
+                    writer.write(responseMessage);
                     writer.flush();
                     client.close();
                     reader.close();
@@ -60,6 +58,7 @@ public class HTTPServer {
 
             throw new RuntimeException(e);
         }
+
 
         }
 

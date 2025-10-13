@@ -8,7 +8,14 @@ import java.sql.Connection;
 public class Router {
 
 
-    public static String route(Request req, Connection conn, SessionManager sessionManager) {
+    public static String route(Request req, Connection conn, SessionManager sessionManager) throws Exception {
+
+
+        String method = req.getMethod();
+
+        if (method == null) {
+            return Response.badRequest(req);
+        }
 
         if (!(req.getMethod().equalsIgnoreCase("OPTIONS"))) {
 
