@@ -62,4 +62,21 @@ public class Response {
 
     }
 
+    public static String unsuccessfulLogin(Request request) {
+
+        String body = "{\"status\":\"failure\",\"message\":\"Invalid username or password.\"}";
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 401 Unauthorized\r\n" +
+                "Content-Type: application/json\r\n" +
+                "Access-Control-Allow-Origin: *\r\n" +
+                "Access-Control-Allow-Headers: Content-Type, Authorization\r\n" +
+                "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n" +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+    }
+
+
 }

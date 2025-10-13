@@ -22,7 +22,9 @@ public class Library {
     }
 
 
-    public void displayBooks(Connection conn) {
+    public static String displayBooks(Connection conn) {
+
+        StringBuilder booksResult = new StringBuilder();
 
         try {
 
@@ -31,7 +33,9 @@ public class Library {
                 String sql = "select * from books";
                 var rs = st.executeQuery(sql);
                 boolean hasBooks = false;
+
                 while (rs.next()) {
+
                     if (!hasBooks) {
                         System.out.println("Library books: ");
                         hasBooks = true;
@@ -45,12 +49,17 @@ public class Library {
 
                     Book book = new Book(title, author, avai, pages, kind);
                     book.setId(id);
-                    System.out.println(book);
+
+                    booksResult.append(book).append("\n");
+
+
 
 
             }
                 if (!hasBooks) {
+
                     System.out.println("Library doesn't have any books.");
+                    return "";
                 }
 
         } catch (SQLException e) {
@@ -58,11 +67,11 @@ public class Library {
              e.getStackTrace();
 
         }
-
-
+        System.out.println(booksResult);
+        return booksResult.toString();
     }
 
-    public boolean displayUserBorrowedBooks(int id, Connection conn) {
+    public static boolean displayUserBorrowedBooks(int id, Connection conn) {
 
         String sql = "SELECT books.title, books.author, books.kind, books.pages, borrowed_books.borrowed_at, books.id, borrowed_books.book_id FROM borrowed_books " +
                 "JOIN books ON books.id=borrowed_books.book_id WHERE borrowed_books.user_id=?;";

@@ -13,7 +13,7 @@ public class SessionManager {
 
     ConcurrentHashMap<UUID, User> sessionIdMap = new ConcurrentHashMap<>();
 
-    public SessionResult handleSession(Request request, Connection connection) throws Exception {
+    public SessionResult handleSession(Request request, User user) throws Exception {
 
         UUID uuid  = request.getUserId();
 
@@ -23,23 +23,10 @@ public class SessionManager {
 
         } else {
 
-            if (request.getPath().equalsIgnoreCase("/login")) {
+            UUID uuid1 = UUID.randomUUID();
+            sessionIdMap.put(uuid1, user);
+            return new SessionResult(user, uuid1);
 
-                User user = UserHandler.handleLogin(request, connection);
-
-                if (user != null) {
-                    UUID uuid1 = UUID.randomUUID();
-                    sessionIdMap.put(uuid1, user);
-                    return new SessionResult(user, uuid1);
-                } else {
-                    System.out.println("user doesn't exist");
-                    return null;
-
-                }
-            } else {
-
-                throw new Exception("Something went wrong");
-            }
 
 
         }

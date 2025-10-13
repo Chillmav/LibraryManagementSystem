@@ -3,14 +3,17 @@ package handlers;
 import classes.Library;
 import classes.users.User;
 import server.Request;
+import server.Response;
+import server.SessionManager;
 import utils.JsonUtils;
+import utils.SessionResult;
 
 import java.sql.Connection;
 import java.util.Map;
 
 public class UserHandler {
 
-    public static User handleLogin(Request req, Connection conn) {
+    public static String handleLogin(Request req, Connection conn, SessionManager sessionManager) {
 
 
         String body = req.getBody();
@@ -21,10 +24,14 @@ public class UserHandler {
 
             String email = accountCredentials.get("email");
             String password = accountCredentials.get("password");
-            System.out.println(email);
-            System.out.println(password);
+            User user = Library.verifyUser(conn, email, password);
 
-            return Library.verifyUser(conn, email, password);
+            if (user != null) {
+                SessionResult sr = sessionManager.handleSession(req, user);
+                return Response.successfulLogin(req, sr.uuid());
+            } else {
+                return Response.unsuccessfulLogin(req);
+            }
 
 
 
@@ -35,7 +42,8 @@ public class UserHandler {
         return null;
     }
 
-    public static void handleRegister(Request req) {
+    public static String handleRegister(Request req, Connection conn) {
         String body = req.getBody();
+        return "";
     }
 }

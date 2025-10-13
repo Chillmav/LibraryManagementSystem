@@ -15,7 +15,7 @@ public class JsonUtils {
         try {
 
             Map<String, String> map = mapper.readValue(json, Map.class);
-            map.forEach((k, v) -> System.out.println(k + ": " + v));
+//            map.forEach((k, v) -> System.out.println(k + ": " + v));
             return map;
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);

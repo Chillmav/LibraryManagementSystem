@@ -39,23 +39,46 @@ function LoginComponent() {
 
     return (
 
-        <div className="bg-white w-[60vw] h-[70vh] rounded-2xl shadow-xl flex items-center flex-col">
+<div className="bg-white w-[90vw] max-w-md h-auto rounded-2xl shadow-xl flex flex-col items-center p-8 md:p-12">
 
-                <h1 className="pt-10 font-500 text-4xl">Library Management System</h1>
-                <div className="mt-[60px] flex flex-col gap-y-10">
-                <input type="text" placeholder="Email" className="border-2 rounded-md min-w-[400px] py-5 px-3 text-[20px]" value={email} onChange={(e) => setEmail(e.target.value)}/>
-                <input type="password" placeholder="Password" className="border-2 rounded-md min-w-[400px] py-5 px-3 text-[20px]" value={password} onChange={(e) => setPassword(e.target.value)}/>
-                <button className=" border-2 rounded-md min-w-[400px] py-5 px-3 text-[25px] bg-blue-500 border-blue-500 cursor-pointer text-white"
-                onClick={handlelogin}
-                >Login
-                </button>
-                {loginError ? <p className='text-2xl text-red-400'>Something went wrong, try again.
-                </p> : <></>}
-                </div>
-                <div className="bg-gray-500 min-w-[450px] h-[1px] mt-10"></div>
-                <button className="mt-15 border-2 rounded-md min-w-[400px] py-5 px-3 text-[25px] bg-green-600 border-green-600 cursor-pointer text-white">Create new account</button>
+  <h1 className="font-semibold text-2xl md:text-4xl text-center mt-4">
+    Library Management System
+  </h1>
 
-        </div>
+  <div className="mt-10 flex flex-col w-full gap-y-6">
+    <input
+      type="text"
+      placeholder="Email"
+      className="border-2 rounded-md w-full py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+    />
+    <input
+      type="password"
+      placeholder="Password"
+      className="border-2 rounded-md w-full py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      value={password}
+      onChange={(e) => setPassword(e.target.value)}
+    />
+    <button
+      className="rounded-md w-full py-4 text-xl bg-blue-500 hover:bg-blue-600 transition-colors text-white"
+      onClick={handlelogin}
+    >
+      Login
+    </button>
+
+    {loginError && (
+      <p className="text-lg text-red-500 text-center">Something went wrong, try again.</p>
+    )}
+  </div>
+
+  <div className="bg-gray-300 w-full h-[1px] mt-10"></div>
+
+  <button className="mt-6 rounded-md w-full py-4 text-xl bg-green-600 hover:bg-green-700 transition-colors text-white">
+    Create new account
+  </button>
+</div>
+
 
     )
 

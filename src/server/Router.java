@@ -1,5 +1,6 @@
 package server;
 
+import handlers.BooksHandler;
 import handlers.UserHandler;
 
 import java.sql.Connection;
@@ -7,25 +8,22 @@ import java.sql.Connection;
 public class Router {
 
 
-    public static void route(Request req, Connection conn) {
+    public static String route(Request req, Connection conn, SessionManager sessionManager) {
 
         if (!(req.getMethod().equalsIgnoreCase("OPTIONS"))) {
 
-            switch (req.getPath()) {
+            return switch (req.getPath()) {
 
-                case "/login":
+                case "/login" -> UserHandler.handleLogin(req, conn, sessionManager);
+                case "/register" -> UserHandler.handleRegister(req, conn);
+                case "/library_books" -> BooksHandler.getLibraryBooks(req, conn, sessionManager);
+                default -> "";
+            };
 
-                    UserHandler.handleLogin(req, conn);
-                    break;
+        } else {
 
-                case "/register":
+            return Response.getResponse(req, "200");
 
-                    UserHandler.handleRegister(req);
-                    break;
-
-                default:
-                    break;
-            }
         }
 
     }
