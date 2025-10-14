@@ -73,7 +73,7 @@ public class Response {
         return "HTTP/1.1 200 OK\r\n" +
                 corsHeaders() +
                 "Set-Cookie: SESSIONID=" + sessionId.toString() +
-                "; Path=/; HttpOnly; SameSite=None\r\n"
+                "; Path=/; HttpOnly; SameSite=None; Secure\r\n"
                 +
                 "Connection: close\r\n" +
                 "Content-Length: " + length + "\r\n" +
@@ -99,7 +99,7 @@ public class Response {
 
     public static String getLibraryBooks(Request request, String books) {
 
-        String body = "{\"books\": " + books + "}";
+        String body = "[%s]".formatted(books);
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 200 OK\r\n" +

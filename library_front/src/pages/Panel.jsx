@@ -11,9 +11,12 @@ function Panel() {
     useEffect(() => {
         
         if (booksOption === "all") {
+
+            console.log("Fetching books...");
             
             fetch("http://localhost:9000/library_books", {
             method: "GET",
+            headers: { "Content-Type": "application/json" },
             credentials: "include", 
             }).then(res => res.json()).then(data => console.log(data)).catch(error => console.error(error));
 

@@ -47,7 +47,6 @@ public class Request {
 
         StringBuilder headers = new StringBuilder();
         String line;
-        String body;
         String userId = "";
 
         int bodyLength = 0;

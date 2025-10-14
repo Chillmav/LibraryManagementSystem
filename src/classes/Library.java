@@ -2,6 +2,7 @@ package classes;
 
 import classes.users.Reader;
 import classes.users.User;
+import utils.JsonUtils;
 import utils.PasswordUtils;
 
 import java.security.NoSuchAlgorithmException;
@@ -50,10 +51,7 @@ public class Library {
                     Book book = new Book(title, author, avai, pages, kind);
                     book.setId(id);
 
-                    booksResult.append(book).append("\n");
-
-
-
+                    booksResult.append(JsonUtils.createJsonStringFromObject(book)).append(",");
 
             }
                 if (!hasBooks) {
@@ -67,7 +65,10 @@ public class Library {
              e.getStackTrace();
 
         }
-        System.out.println(booksResult);
+        if (!booksResult.isEmpty()) {
+            booksResult.deleteCharAt(booksResult.length() - 1);
+        }
+
         return booksResult.toString();
     }
 
@@ -96,6 +97,7 @@ public class Library {
                 Book book = new Book(book_title, book_author, false, book_pages, book_kind);
                 book.setId(rs.getInt(6));
                 System.out.println(book + " borrowed at: " + borrowed_at.toLocalDateTime().toString());
+
             }
             if (!hasBooks) {
                 System.out.println("You don`t have borrowed books.");
@@ -105,6 +107,7 @@ public class Library {
 
 
         } catch (SQLException e) {
+
             throw new RuntimeException(e);
         }
 

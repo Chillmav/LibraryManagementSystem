@@ -20,6 +20,7 @@ function LoginComponent() {
         await fetch("http://localhost:9000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
         })
         .then(res => res.json())
