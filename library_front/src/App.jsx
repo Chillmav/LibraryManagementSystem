@@ -7,8 +7,8 @@ import Panel from './pages/Panel.jsx';
 
 function App() {
 
-  const [username, setUsername] = useState("");
-  const [books, setBooks] = useState([]);
+  const [username] = useState("");
+  const [books] = useState([]);
 
   return (
 

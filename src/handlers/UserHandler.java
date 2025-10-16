@@ -46,4 +46,9 @@ public class UserHandler {
         String body = req.getBody();
         return "";
     }
+
+    public static String handleLogout(Request req, Connection conn) {
+
+        return Response.logout(req);
+    }
 }

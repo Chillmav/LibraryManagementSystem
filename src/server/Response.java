@@ -88,7 +88,24 @@ public class Response {
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 401 Unauthorized\r\n" +
-                    corsHeaders() +
+                corsHeaders() +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+
+    }
+
+    public static String logout(Request request) {
+
+        String body = "{\"status\":\"success\",\"message\":\"User logged out successfully.\"}";
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 200 OK\r\n" +
+                corsHeaders() +
+                "Set-Cookie: SESSIONID=;" + "Max-Age=0;" +
+                "Path=/; HttpOnly; SameSite=None; Secure\r\n"
+                +
                 "Connection: close\r\n" +
                 "Content-Length: " + length + "\r\n" +
                 "\r\n" +

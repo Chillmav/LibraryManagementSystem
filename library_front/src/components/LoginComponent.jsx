@@ -1,16 +1,21 @@
 import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
+import handlelogout from '../utils/handleLogout';
 
 function LoginComponent() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState(false);
-
-
+    const navigator = useNavigate();
+    
     useEffect(() => {
+
+        handlelogout(navigator);
         setLoginError(false);
+        
     }, []);
+
 
 
     const navigate = useNavigate();

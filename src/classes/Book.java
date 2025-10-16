@@ -55,4 +55,8 @@ public class Book {
     public Kind getKind() {
         return kind;
     }
+
+    public int getId() {
+        return id;
+    }
 }
