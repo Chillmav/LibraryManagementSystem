@@ -72,10 +72,12 @@ public class Library {
         return booksResult.toString();
     }
 
-    public static boolean displayUserBorrowedBooks(int id, Connection conn) {
+    public static String displayUserBorrowedBooks(int id, Connection conn) {
 
         String sql = "SELECT books.title, books.author, books.kind, books.pages, borrowed_books.borrowed_at, books.id, borrowed_books.book_id FROM borrowed_books " +
                 "JOIN books ON books.id=borrowed_books.book_id WHERE borrowed_books.user_id=?;";
+        StringBuilder booksResult = new StringBuilder();
+
         try {
 
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -93,17 +95,18 @@ public class Library {
                 String book_author = rs.getString(2);
                 Kind book_kind = Kind.valueOf(rs.getString(3));
                 int book_pages = rs.getInt(4);
-                Timestamp borrowed_at = rs.getTimestamp(5);
                 Book book = new Book(book_title, book_author, false, book_pages, book_kind);
                 book.setId(rs.getInt(6));
-                System.out.println(book + " borrowed at: " + borrowed_at.toLocalDateTime().toString());
+                booksResult.append(JsonUtils.createJsonStringFromObject(book)).append(",");
 
             }
             if (!hasBooks) {
+
                 System.out.println("You don`t have borrowed books.");
-                return false;
+                return "";
             }
-            return true;
+
+            return booksResult.toString();
 
 
         } catch (SQLException e) {

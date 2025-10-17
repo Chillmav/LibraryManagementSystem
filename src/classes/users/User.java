@@ -66,7 +66,7 @@ public class User {
                 return 3;
 
             case "4":
-                returnBook(scanner, conn, library);
+//                returnBook(scanner, conn, library);
                 return 4;
 
             case "5":
@@ -79,63 +79,63 @@ public class User {
 
     }
 
-    private void returnBook(Scanner scanner, Connection conn, Library library) {
-
-        boolean hasBooks = library.displayUserBorrowedBooks(this.id, conn);
-
-        if (!hasBooks) {
-            return;
-        }
-
-        System.out.println();
-        System.out.println("Type book id: ");
-        String idString = scanner.nextLine();
-        int id = Integer.parseInt(idString);
-
-        String sql = "SELECT book_id from borrowed_books WHERE book_id=?";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setInt(1, id);
-
-            var rs = ps.executeQuery();
-
-            boolean isBookExist = false;
-
-            if (rs.next()) {
-                isBookExist = true;
-
-                String deleteSql = "DELETE FROM borrowed_books WHERE book_id=?";
-
-                        try (PreparedStatement ps2 = conn.prepareStatement(deleteSql)) {
-                            ps2.setInt(1, id);
-                            ps2.executeUpdate();
-                        } catch (SQLException e) {
-                            e.getStackTrace();
-                        }
-
-                String setAvailableTrue = "UPDATE books SET available=true WHERE id=?";
-
-                        try (PreparedStatement ps3 = conn.prepareStatement(setAvailableTrue)) {
-                            ps3.setInt(1, id);
-                            ps3.executeUpdate();
-                            System.out.println("You returned your book successfully");
-                        }
-
-
-
-            }
-
-            if (!isBookExist) {
-                System.out.println("Please provide correct id.");
-            }
-
-
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
-
-    }
+//    private void returnBook(Scanner scanner, Connection conn, Library library) {
+//
+//        boolean hasBooks = library.displayUserBorrowedBooks(this.id, conn);
+//
+//        if (!hasBooks) {
+//            return;
+//        }
+//
+//        System.out.println();
+//        System.out.println("Type book id: ");
+//        String idString = scanner.nextLine();
+//        int id = Integer.parseInt(idString);
+//
+//        String sql = "SELECT book_id from borrowed_books WHERE book_id=?";
+//
+//        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+//
+//            ps.setInt(1, id);
+//
+//            var rs = ps.executeQuery();
+//
+//            boolean isBookExist = false;
+//
+//            if (rs.next()) {
+//                isBookExist = true;
+//
+//                String deleteSql = "DELETE FROM borrowed_books WHERE book_id=?";
+//
+//                        try (PreparedStatement ps2 = conn.prepareStatement(deleteSql)) {
+//                            ps2.setInt(1, id);
+//                            ps2.executeUpdate();
+//                        } catch (SQLException e) {
+//                            e.getStackTrace();
+//                        }
+//
+//                String setAvailableTrue = "UPDATE books SET available=true WHERE id=?";
+//
+//                        try (PreparedStatement ps3 = conn.prepareStatement(setAvailableTrue)) {
+//                            ps3.setInt(1, id);
+//                            ps3.executeUpdate();
+//                            System.out.println("You returned your book successfully");
+//                        }
+//
+//
+//
+//            }
+//
+//            if (!isBookExist) {
+//                System.out.println("Please provide correct id.");
+//            }
+//
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//    }
 
 
     private void borrowBook(Scanner scanner, Connection conn, Library library) {

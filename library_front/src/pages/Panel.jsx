@@ -14,7 +14,7 @@ function Panel() {
         
         if (booksOption === "all") {
 
-            console.log("Fetching books...");
+            console.log("Fetching library books...");
             
             fetch("http://localhost:9000/library_books", {
             method: "GET",
@@ -25,7 +25,17 @@ function Panel() {
                 console.log(data)}).catch(error => console.error(error));
 
         } else if (booksOption === "yours") {
-            //
+            
+            console.log("Fetching user books...");
+            
+            fetch("http://localhost:9000/user_books", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", 
+            }).then(res => res.json()).then(data => {
+                setBooks(data)
+                console.log(data)}).catch(error => console.error(error));
+
         }
 
 

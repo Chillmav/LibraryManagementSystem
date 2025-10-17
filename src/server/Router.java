@@ -24,6 +24,7 @@ public class Router {
                 case "/login" -> UserHandler.handleLogin(req, conn, sessionManager);
                 case "/register" -> UserHandler.handleRegister(req, conn);
                 case "/library_books" -> BooksHandler.getLibraryBooks(req, conn, sessionManager);
+                case "/user_books" -> BooksHandler.getUserBooks(req, conn, sessionManager);
                 case "/logout" -> UserHandler.handleLogout(req, conn);
                 default -> "";
             };

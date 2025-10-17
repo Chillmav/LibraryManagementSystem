@@ -11,6 +11,32 @@ import java.util.UUID;
 
 public class BooksHandler {
 
+
+    public static String getUserBooks(Request req, Connection conn, SessionManager sessionManager) {
+
+        UUID uuid = req.getUserId();
+        System.out.println("BooksHandler(getUserBooks invoked for userId: " + uuid);
+
+        if (uuid == null) {
+
+            System.out.println("User ID is null — possibly not logged in or missing session.");
+            return Response.unauthorized("User not logged in");
+
+        }
+
+        if (sessionManager.getSessionIdMap().get(uuid) != null) {
+
+            String booksToDisplay = Library.displayUserBorrowedBooks(sessionManager.getSessionIdMap().get(uuid).getId(), conn);
+            System.out.println(booksToDisplay);
+
+            return Response.getLibraryBooks(req, booksToDisplay);
+
+        } else {
+
+            return "";
+
+        }
+    }
     public static String getLibraryBooks(Request req, Connection conn, SessionManager sessionManager) {
 
         UUID uuid = req.getUserId();
