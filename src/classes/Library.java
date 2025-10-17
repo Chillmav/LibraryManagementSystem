@@ -106,6 +106,10 @@ public class Library {
                 return "";
             }
 
+            if (!booksResult.isEmpty()) {
+                booksResult.deleteCharAt(booksResult.length() - 1);
+            }
+
             return booksResult.toString();
 
 

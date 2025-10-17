@@ -24,7 +24,7 @@ function Panel() {
                 setBooks(data)
                 console.log(data)}).catch(error => console.error(error));
 
-        } else if (booksOption === "yours") {
+        } else if (booksOption === "user") {
             
             console.log("Fetching user books...");
             
