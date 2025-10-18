@@ -13,6 +13,11 @@ public class Request {
     private String headers;
     private String body;
     private UUID userId;
+    private String hostAdress;
+    public String getHostAddress() {
+        return hostAdress;
+    }
+
 
     public Request(BufferedReader reader) {
 
@@ -34,6 +39,7 @@ public class Request {
                 this.path = methodAndPath[1];
                 this.headers = headersAndBody[0];
                 this.body = headersAndBody[1];
+                this.hostAdress = headersAndBody[3];
 
             }
 
@@ -48,6 +54,7 @@ public class Request {
         StringBuilder headers = new StringBuilder();
         String line;
         String userId = "";
+        String hostAdress = "";
 
         int bodyLength = 0;
         while ((line = reader.readLine()) != null && !line.isEmpty()) {
@@ -72,6 +79,12 @@ public class Request {
                 }
             }
 
+            if (line.startsWith("Origin: ")) {
+
+                hostAdress = line.substring(8).trim();
+
+            }
+
 
         }
 
@@ -79,7 +92,7 @@ public class Request {
         reader.read(bodyChars, 0, bodyLength);
 
 
-        return new String[]{String.valueOf(headers), String.valueOf(bodyChars), userId};
+        return new String[]{String.valueOf(headers), String.valueOf(bodyChars), userId, hostAdress};
     }
 
     private String[] extractMethodAndPath(BufferedReader reader) throws IOException{
@@ -121,4 +134,6 @@ public class Request {
     }
 
     public UUID getUserId() {return userId;}
+
+
 }

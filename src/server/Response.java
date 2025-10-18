@@ -7,9 +7,10 @@ import java.util.UUID;
 
 public class Response {
 
-    private static String corsHeaders() {
 
-        return "Access-Control-Allow-Origin: http://localhost:5173\r\n" +
+    private static String corsHeaders(Request request) {
+
+        return "Access-Control-Allow-Origin: %s\r\n".formatted(request.getHostAddress()) +
                 "Access-Control-Allow-Credentials: true\r\n" +
                 "Access-Control-Allow-Headers: Content-Type, Authorization\r\n" +
                 "Access-Control-Allow-Methods: GET, POST, OPTIONS\r\n";
@@ -24,7 +25,7 @@ public class Response {
         if (method.equalsIgnoreCase("OPTIONS")) {
 
             return "HTTP/1.1 " + status + " No Content\r\n" +
-                    corsHeaders() +
+                    corsHeaders(request) +
                     "Content-Length: 0\r\n" +
                     "\r\n";
 
@@ -33,7 +34,7 @@ public class Response {
             String body = "{\"message\":\"" + message + "\"}";
             int content_length = body.getBytes(StandardCharsets.UTF_8).length;
             return "HTTP/1.1 " + status + " OK\r\n" +
-                    corsHeaders() +
+                    corsHeaders(request) +
                     "Connection: close\r\n" +
                     "Content-Length: " + content_length +"\r\n" +
                     "\r\n" +
@@ -50,13 +51,13 @@ public class Response {
 
 
 
-    public static String unauthorized(String message) {
+    public static String unauthorized(Request request, String message) {
 
         String body = "{\"status\":\"failure\",\"message\":\"%s\"}".formatted(message);
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 401 Unauthorized\r\n" +
-                 corsHeaders() +
+                 corsHeaders(request) +
                 "Connection: close\r\n" +
                 "Content-Length: " + length + "\r\n" +
                 "\r\n" +
@@ -71,7 +72,7 @@ public class Response {
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 200 OK\r\n" +
-                corsHeaders() +
+                corsHeaders(request) +
                 "Set-Cookie: SESSIONID=" + sessionId.toString() +
                 "; Path=/; HttpOnly; SameSite=None; Secure\r\n"
                 +
@@ -88,7 +89,7 @@ public class Response {
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 401 Unauthorized\r\n" +
-                corsHeaders() +
+                corsHeaders(request) +
                 "Connection: close\r\n" +
                 "Content-Length: " + length + "\r\n" +
                 "\r\n" +
@@ -102,7 +103,7 @@ public class Response {
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 200 OK\r\n" +
-                corsHeaders() +
+                corsHeaders(request) +
                 "Set-Cookie: SESSIONID=;" + "Max-Age=0;" +
                 "Path=/; HttpOnly; SameSite=None; Secure\r\n"
                 +
@@ -120,7 +121,7 @@ public class Response {
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 200 OK\r\n" +
-                corsHeaders() +
+                corsHeaders(request) +
                 "Connection: close\r\n" +
                 "Content-Length: " + length + "\r\n" +
                 "\r\n" +
@@ -132,8 +133,38 @@ public class Response {
     public static String badRequest(Request request) {
 
         return "HTTP/1.1 400 Bad Request\r\n" +
-                corsHeaders() +
+                corsHeaders(request) +
                 "Connection: close\r\n\r\n";
+    }
+
+    public static String success(Request request) {
+
+        String body = "{\"status\":\"success\",\"message\":\"Success\"}";
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 200 OK\r\n" +
+                corsHeaders(request) +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+
+
+    }
+
+    public static String failure(Request request) {
+
+        String body = "{\"status\":\"failure\",\"message\":\"Failure\"}";
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 400 Bad Request\r\n" +
+                corsHeaders(request) +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+
+
     }
 
 

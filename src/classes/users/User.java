@@ -3,7 +3,11 @@ package classes.users;
 
 import classes.Library;
 import classes.Role;
+import server.Request;
+import server.Response;
+import utils.JsonUtils;
 
+import java.lang.module.ResolutionException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -138,13 +142,10 @@ public class User {
 //    }
 
 
-    private void borrowBook(Scanner scanner, Connection conn, Library library) {
+    public String borrowBook(Connection conn, Request request) {
 
-        library.displayBooks(conn);
-        System.out.println();
-        System.out.println("Type book id: ");
-        String idString = scanner.nextLine();
-        int id = Integer.parseInt(idString);
+        var book = JsonUtils.createMapFromJson(request.getBody());
+        int id = Integer.parseInt(book.get("id"));
 
         String sql = "SELECT available, title from books WHERE id=?";
 
@@ -185,12 +186,15 @@ public class User {
                             "You borrowed  \"%s\"  successfully \n"
                             , rs.getString(2));
 
+
+                    return Response.success(request);
                 }
+
             }
 
-            if (!isBookExist) {
-                System.out.println("There is no book in library with such an index.");
-            }
+//            if (!isBookExist) {
+//                System.out.println("There is no book in library with such an index.");
+//            }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);

@@ -12,7 +12,7 @@ public class Router {
 
 
         String method = req.getMethod();
-
+        System.out.println(req.getPath());
         if (method == null) {
             return Response.badRequest(req);
         }
@@ -25,6 +25,7 @@ public class Router {
                 case "/register" -> UserHandler.handleRegister(req, conn);
                 case "/library_books" -> BooksHandler.getLibraryBooks(req, conn, sessionManager);
                 case "/user_books" -> BooksHandler.getUserBooks(req, conn, sessionManager);
+                case "/borrow" -> BooksHandler.borrowBook(req, conn, sessionManager);
                 case "/logout" -> UserHandler.handleLogout(req, conn);
                 default -> "";
             };

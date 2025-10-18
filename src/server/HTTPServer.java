@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.concurrent.Executors;
 
 
 public class HTTPServer {
@@ -26,6 +27,7 @@ public class HTTPServer {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Provide password to db: "); // haslodb
         String password = scanner.nextLine();
+
         try (Connection connection = DriverManager.getConnection(CONN_STRING, USER, password)) {
 
             try (ServerSocket serverSocket = new ServerSocket(9000)) {
@@ -33,17 +35,11 @@ public class HTTPServer {
 
                 while (true) {
 
+
                     Socket client = serverSocket.accept();
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(client.getInputStream()));  // Read data from the input stream (from a client)
-                    PrintWriter writer = new PrintWriter(new OutputStreamWriter(client.getOutputStream())); // Write data to the client
-                    Request request = new Request(reader);
-
-                    String responseMessage = Router.route(request, connection, sessionManager);
-
-                    writer.write(responseMessage);
-                    writer.flush();
-                    client.close();
-                    reader.close();
+                    ClientHandler clientHandler = new ClientHandler(client, sessionManager, connection);
+                    Thread thread = new Thread(clientHandler);
+                    thread.start();
 
                 }
 
