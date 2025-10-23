@@ -167,6 +167,18 @@ public class Response {
 
     }
 
+    public static String sendSessionTime(Request req, String time) {
+        String body = "{\"status\":\"Success\",\"message\":\"%s\"}".formatted(time);
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 200 OK\r\n" +
+                corsHeaders(req) +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+    }
+
 
 
 

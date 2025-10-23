@@ -8,6 +8,7 @@ function Panel() {
     const [booksOption, setBooksOption] = useState("all"); // user is second choice
     const [page, setPage] = useState(1);
     const [books, setBooks] = useState([]);
+    const [sessionTime, setSessionTime] = useState();
     const navigator = useNavigate();
 
     useEffect(() => {
@@ -41,8 +42,19 @@ function Panel() {
 
     }, [booksOption])
 
-    return (
+    useEffect(() => {
 
+        fetch("http://localhost:9000/user_session_time", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include", 
+        }).then(res => res.json()).then(data => {setSessionTime(data); console.log(data)}).catch(error => console.error(error));
+
+    }, [])
+
+    return (
+<>
+    <div className="absolute top-2  left-2 w-[10vw] h-[2vw] bg-amber-50">Session time: </div>
     <div className="bg-white w-[60vw] h-[70vh] rounded-2xl shadow-xl flex  flex-col absolute">
         
         <div className="flex justify-between mx-15">
@@ -66,7 +78,7 @@ function Panel() {
         </Books>
         
     </div>
-
+</>
     );
 
 }

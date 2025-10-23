@@ -18,7 +18,7 @@ function App() {
       backgroundSize: "cover",
       backgroundPosition: "center",
       minHeight: "100vh"
-      }} className='flex justify-center items-center'>
+      }} className='flex justify-center items-center relative'>
         
       <Routes>
         <Route path="/" element={<LoginComponent />} />

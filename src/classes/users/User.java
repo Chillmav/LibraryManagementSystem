@@ -66,7 +66,7 @@ public class User {
 
             case "3":
 
-                borrowBook(scanner, conn, library);
+//                borrowBook(scanner, conn, library);
                 return 3;
 
             case "4":
@@ -200,6 +200,7 @@ public class User {
             throw new RuntimeException(e);
         }
 
+        return Response.failure(request);
     }
 
     @Override

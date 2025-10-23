@@ -7,6 +7,7 @@ import server.Response;
 import server.SessionManager;
 import utils.JsonUtils;
 import utils.SessionResult;
+import utils.UserSession;
 
 import java.sql.Connection;
 import java.util.Map;
@@ -50,5 +51,18 @@ public class UserHandler {
     public static String handleLogout(Request req, Connection conn) {
 
         return Response.logout(req);
+    }
+
+    public static String sendSessionTime(Request req, Connection conn, SessionManager sessionManager) {
+
+        UserSession us = sessionManager.getSessionIdMap().get(req.getUserId());
+
+        if (us != null) {
+            long seconds = us.getRemainingTime();
+            return Response.sendSessionTime(req, String.valueOf(seconds));
+        } else {
+            return Response.logout(req);
+        }
+
     }
 }

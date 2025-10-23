@@ -24,7 +24,7 @@ public class BooksHandler {
             return Response.unauthorized(req,"User not logged in");
 
         }
-        User user = sessionManager.getSessionIdMap().get(uuid);
+        User user = sessionManager.getSessionIdMap().get(uuid).getUser();
         String booksToDisplay = user.borrowBook(conn, req);
         System.out.println(booksToDisplay);
 
@@ -46,7 +46,7 @@ public class BooksHandler {
 
         if (sessionManager.getSessionIdMap().get(uuid) != null) {
 
-            String booksToDisplay = Library.displayUserBorrowedBooks(sessionManager.getSessionIdMap().get(uuid).getId(), conn);
+            String booksToDisplay = Library.displayUserBorrowedBooks(sessionManager.getSessionIdMap().get(uuid).getUser().getId(), conn);
             System.out.println(booksToDisplay);
 
             return Response.getLibraryBooks(req, booksToDisplay);

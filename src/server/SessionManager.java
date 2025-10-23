@@ -4,14 +4,18 @@ import classes.Library;
 import classes.users.User;
 import handlers.UserHandler;
 import utils.SessionResult;
+import utils.UserSession;
 
 import java.sql.Connection;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalUnit;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class SessionManager {
 
-    ConcurrentHashMap<UUID, User> sessionIdMap = new ConcurrentHashMap<>();
+    ConcurrentHashMap<UUID, UserSession> sessionIdMap = new ConcurrentHashMap<>();
 
     public SessionResult handleSession(Request request, User user) throws Exception {
 
@@ -24,14 +28,15 @@ public class SessionManager {
         } else {
 
             UUID uuid1 = UUID.randomUUID();
-            sessionIdMap.put(uuid1, user);
-            return new SessionResult(user, uuid1);
+            UserSession us = new UserSession(user, Duration.of(300, ChronoUnit.SECONDS));
+            sessionIdMap.put(uuid1, us);
+            return new SessionResult(us, uuid1);
 
         }
 
     }
 
-    public ConcurrentHashMap<UUID, User> getSessionIdMap() {
+    public ConcurrentHashMap<UUID, UserSession> getSessionIdMap() {
         return sessionIdMap;
     }
 }

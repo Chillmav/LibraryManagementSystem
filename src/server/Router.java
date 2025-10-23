@@ -22,6 +22,7 @@ public class Router {
             return switch (req.getPath()) {
 
                 case "/login" -> UserHandler.handleLogin(req, conn, sessionManager);
+                case "/user_session_time" -> UserHandler.sendSessionTime(req, conn, sessionManager);
                 case "/register" -> UserHandler.handleRegister(req, conn);
                 case "/library_books" -> BooksHandler.getLibraryBooks(req, conn, sessionManager);
                 case "/user_books" -> BooksHandler.getUserBooks(req, conn, sessionManager);

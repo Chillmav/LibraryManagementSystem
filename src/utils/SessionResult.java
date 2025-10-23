@@ -4,5 +4,5 @@ import classes.users.User;
 
 import java.util.UUID;
 
-public record SessionResult (User user, UUID uuid) {}
+public record SessionResult (UserSession userSession, UUID uuid) {}
 
