@@ -10,14 +10,27 @@ import java.sql.Connection;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SessionManager {
 
     ConcurrentHashMap<UUID, UserSession> sessionIdMap = new ConcurrentHashMap<>();
 
-    public SessionResult handleSession(Request request, User user) throws Exception {
+
+    public SessionManager() {
+
+        ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+        scheduler.scheduleAtFixedRate(this::checkAndExpire, 0, 1, TimeUnit.MINUTES);
+
+    }
+
+    public SessionResult handleSession(Request request, User user) {
 
         UUID uuid  = request.getUserId();
 
@@ -38,5 +51,11 @@ public class SessionManager {
 
     public ConcurrentHashMap<UUID, UserSession> getSessionIdMap() {
         return sessionIdMap;
+    }
+
+    private void checkAndExpire() {
+
+        sessionIdMap.entrySet().removeIf(entry -> entry.getValue().isExpired());
+
     }
 }
