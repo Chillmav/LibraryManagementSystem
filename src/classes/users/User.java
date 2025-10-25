@@ -44,109 +44,71 @@ public class User {
         return role;
     }
 
-    public int displayPanel(Scanner scanner, Library library, Connection conn) {
+    public String returnBook(Connection conn, Request request) {
 
-        System.out.println("Display all books(1)");
-        System.out.println("Display your borrowed books(2)");
-        System.out.println("Borrow book(3)");
-        System.out.println("Give back the book(4)");
-        System.out.println("Log out(5)");
+        System.out.println(request.getBody());
+        var book = JsonUtils.createMapFromJson(request.getBody());
+        int id = Integer.parseInt(book.get("bookId"));
 
-        String option = scanner.nextLine();
+        String sql = "SELECT book_id from borrowed_books WHERE book_id=?";
 
-        switch (option) {
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
 
-            case "1":
-                library.displayBooks(conn);
-                return 1;
+            ps.setInt(1, id);
 
-            case "2":
-                library.displayUserBorrowedBooks(this.id, conn);
-                return 2;
+            var rs = ps.executeQuery();
 
-            case "3":
+            boolean isBookExist = false;
 
-//                borrowBook(scanner, conn, library);
-                return 3;
+            if (rs.next()) {
 
-            case "4":
-//                returnBook(scanner, conn, library);
-                return 4;
+                isBookExist = true;
+                String deleteSql = "DELETE FROM borrowed_books WHERE book_id=?";
 
-            case "5":
-                return 5;
+                        try (PreparedStatement ps2 = conn.prepareStatement(deleteSql)) {
+                            ps2.setInt(1, id);
+                            ps2.executeUpdate();
+                        } catch (SQLException e) {
+                            e.getStackTrace();
+                        }
 
-            default:
-                System.out.println("Wrong number provided");
-                return 1;
+                String setAvailableTrue = "UPDATE books SET available=true WHERE id=?";
+
+                        try (PreparedStatement ps3 = conn.prepareStatement(setAvailableTrue)) {
+                            ps3.setInt(1, id);
+                            ps3.executeUpdate();
+                            System.out.println("You returned your book successfully");
+                            return Response.success(request);
+                        }
+
+
+
+            }
+
+            if (!isBookExist) {
+
+                System.out.println("Please provide correct id.");
+                return Response.failure(request);
+
+            }
+
+
+        } catch (SQLException e) {
+            Response.failure(request);
+            throw new RuntimeException(e);
         }
 
-    }
+        return Response.failure(request);
 
-//    private void returnBook(Scanner scanner, Connection conn, Library library) {
-//
-//        boolean hasBooks = library.displayUserBorrowedBooks(this.id, conn);
-//
-//        if (!hasBooks) {
-//            return;
-//        }
-//
-//        System.out.println();
-//        System.out.println("Type book id: ");
-//        String idString = scanner.nextLine();
-//        int id = Integer.parseInt(idString);
-//
-//        String sql = "SELECT book_id from borrowed_books WHERE book_id=?";
-//
-//        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-//
-//            ps.setInt(1, id);
-//
-//            var rs = ps.executeQuery();
-//
-//            boolean isBookExist = false;
-//
-//            if (rs.next()) {
-//                isBookExist = true;
-//
-//                String deleteSql = "DELETE FROM borrowed_books WHERE book_id=?";
-//
-//                        try (PreparedStatement ps2 = conn.prepareStatement(deleteSql)) {
-//                            ps2.setInt(1, id);
-//                            ps2.executeUpdate();
-//                        } catch (SQLException e) {
-//                            e.getStackTrace();
-//                        }
-//
-//                String setAvailableTrue = "UPDATE books SET available=true WHERE id=?";
-//
-//                        try (PreparedStatement ps3 = conn.prepareStatement(setAvailableTrue)) {
-//                            ps3.setInt(1, id);
-//                            ps3.executeUpdate();
-//                            System.out.println("You returned your book successfully");
-//                        }
-//
-//
-//
-//            }
-//
-//            if (!isBookExist) {
-//                System.out.println("Please provide correct id.");
-//            }
-//
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }
-//
-//    }
+    }
 
 
     public String borrowBook(Connection conn, Request request) {
 
+        System.out.println(request.getBody());
         var book = JsonUtils.createMapFromJson(request.getBody());
-        int id = Integer.parseInt(book.get("id"));
-
+        int id = Integer.parseInt(book.get("bookId"));
+        System.out.println(id);
         String sql = "SELECT available, title from books WHERE id=?";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

@@ -151,47 +151,4 @@ public class Employee extends User implements classes.interfaces.Employee {
 
     }
 
-    @Override
-    public int displayPanel(Scanner scanner, Library library, Connection conn) {
-
-        System.out.println("Display all books(1)");
-        System.out.println("Add book to library(2)");
-        System.out.println("Remove book from library(3)");
-        System.out.println("Update book(4)");
-        System.out.println("Log out(5)");
-
-        String option = scanner.nextLine();
-
-        switch (option) {
-
-            case "1":
-                library.displayBooks(conn);
-                return 1;
-
-            case "2":
-                addBook(conn, scanner);
-                return 2;
-
-            case "3":
-                library.displayBooks(conn);
-                System.out.println();
-
-                System.out.println("Choose id of book that you want to remove: ");
-                String idString = scanner.nextLine();
-
-                removeBook(conn, Integer.parseInt(idString));
-                return 3;
-
-            case "4":
-
-                return 4;
-
-            case "5":
-                return 5;
-
-            default:
-                System.out.println("Wrong number provided");
-                return 1;
-        }
-    }
 }

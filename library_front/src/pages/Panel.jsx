@@ -5,12 +5,37 @@ import handleLogout from "../utils/handleLogout.js";
 import secondsToMin from "../utils/secondsToMin.js";
 
 function Panel() {
-
+    
     const [booksOption, setBooksOption] = useState("all"); // user is second choice
     const [page, setPage] = useState(1);
     const [books, setBooks] = useState([]);
     const [sessionTime, setSessionTime] = useState(0);
     const navigator = useNavigate();
+
+
+    function fetchAllBooks() { 
+
+        fetch("http://localhost:9000/library_books", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include", 
+                }).then(res => res.json()).then(data => {
+                    setBooks(data)
+                    console.log(data)}).catch(error => {console.error(error); handleLogout(navigator)});
+
+    }
+
+    function fetchUserBooks() {
+
+        fetch("http://localhost:9000/user_books", {
+                method: "GET",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include", 
+                }).then(res => res.json()).then(data => {
+                    setBooks(data)
+                    console.log(data)}).catch(error => {console.error(error); handleLogout(navigator)});
+
+    }
 
     useEffect(() => {
 
@@ -27,27 +52,12 @@ function Panel() {
         if (booksOption === "all") {
 
             console.log("Fetching library books...");
-            
-            fetch("http://localhost:9000/library_books", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include", 
-            }).then(res => res.json()).then(data => {
-                setBooks(data)
-                console.log(data)}).catch(error => {console.error(error); handleLogout(navigator)});
+            fetchAllBooks();
 
         } else if (booksOption === "user") {
             
             console.log("Fetching user books...");
-            
-            fetch("http://localhost:9000/user_books", {
-            method: "GET",
-            headers: { "Content-Type": "application/json" },
-            credentials: "include", 
-            }).then(res => res.json()).then(data => {
-                setBooks(data)
-                console.log(data)}).catch(error => {console.error(error); handleLogout(navigator)});
-
+            fetchUserBooks();
         }
 
 
@@ -65,7 +75,7 @@ function Panel() {
 
     return (
 <>
-    <div className="absolute top-2 left-2 w-[9vw] h-10 bg-white flex items-center justify-center gap-x-2 rounded-2xl">Session time: <p className={sessionTime > 150 ? "text-green-500 font-semibold" : "text-red-500 font-semibold"}>{secondsToMin(sessionTime)}</p></div>
+    <div className="absolute top-2 left-2 w-[12vw] h-10 bg-white flex items-center justify-center gap-x-2 rounded-2xl">Session time: <p className={sessionTime > 150 ? "text-green-500 font-semibold" : "text-red-500 font-semibold"}>{secondsToMin(sessionTime)}</p></div>
     <div className="bg-white w-[60vw] h-[70vh] rounded-2xl shadow-xl flex  flex-col absolute">
         
         <div className="flex justify-between mx-15">
@@ -84,7 +94,7 @@ function Panel() {
         
         </div>
 
-        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books}>
+        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books} fetchAllBooks={fetchAllBooks} fetchUserBooks={fetchUserBooks}>
 
         </Books>
         

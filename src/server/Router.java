@@ -27,6 +27,7 @@ public class Router {
                 case "/library_books" -> BooksHandler.getLibraryBooks(req, conn, sessionManager);
                 case "/user_books" -> BooksHandler.getUserBooks(req, conn, sessionManager);
                 case "/borrow" -> BooksHandler.borrowBook(req, conn, sessionManager);
+                case "/return" -> BooksHandler.returnBook(req, conn, sessionManager);
                 case "/logout" -> UserHandler.handleLogout(req, conn);
                 default -> "";
             };

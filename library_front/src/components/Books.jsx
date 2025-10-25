@@ -1,10 +1,63 @@
 import { useEffect, useState } from "react";
-import { TiPlus } from "react-icons/ti";
+import { TiPlus, TiMinus } from "react-icons/ti";
 
-function Books({booksOption, page, setBooksOption, setPage, books}) {
+function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBooks, fetchAllBooks}) {
 
     const color1 = "bg-yellow-100";
     const color2 = "bg-yellow-300";
+
+
+    async function returnBook(bookId) {
+
+
+        console.log(bookId)
+        fetch("http://localhost:9000/return",{
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                bookId: bookId + ""
+            })
+        }).then(res => res.json()).then(data => {
+
+            if (data.message.toLowerCase() == "success") {
+                console.log(data)
+                fetchUserBooks();
+                alert("You returned a book successfully")
+            } else {
+                console.log(data)
+                alert("Something went wrong")
+            }
+
+        }).catch(error => console.log(error));
+
+    }
+
+    async function borrowBook(bookId) {
+
+
+        console.log(bookId)
+        fetch("http://localhost:9000/borrow",{
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({
+                bookId: bookId + ""
+            })
+        }).then(res => res.json()).then(data => {
+
+            if (data.message.toLowerCase() == "success") {
+                console.log(data)
+                fetchAllBooks();
+                alert("You borrowed a book successfully")
+            } else {
+                console.log(data)
+                alert("Something went wrong")
+            }
+
+        }).catch(error => console.log(error));
+
+    }
 
     return (
 
@@ -36,9 +89,14 @@ function Books({booksOption, page, setBooksOption, setPage, books}) {
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                {book.available ? <button className="bg-lime-500 flex items-center justify-center w-fit h-fit p-4 rounded-2xl cursor-pointer"><TiPlus size={20}/></button> : <></>}
+                                {book.available ? <button className="bg-lime-500 flex items-center justify-center w-fit h-fit p-4 rounded-2xl cursor-pointer" onClick={() => borrowBook(book.id)}><TiPlus size={20}/></button> : <></>}
                             </div>
-                        </div>
+                        {(!book.available && booksOption === "user") ?
+                            <div className="flex items-center">
+                                {<button className="bg-red-500 flex items-center justify-center w-fit h-fit p-4 rounded-2xl cursor-pointer" onClick={() => returnBook(book.id)}><TiMinus size={20}/></button>}
+                            </div> : <></>
+                        }
+                    </div>
 
                 )
                 

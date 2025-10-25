@@ -166,6 +166,19 @@ public class Response {
 
 
     }
+    public static String registerFailure(Request request, String message) {
+
+        String body = "{\"status\":\"failure\",\"message\":\"%s\"}".formatted(message);
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 400 Bad Request\r\n" +
+                corsHeaders(request) +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+
+    }
 
     public static String sendSessionTime(Request req, String time) {
         String body = "{\"status\":\"Success\",\"message\":\"%s\"}".formatted(time);

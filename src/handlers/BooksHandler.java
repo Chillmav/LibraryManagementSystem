@@ -24,11 +24,31 @@ public class BooksHandler {
             return Response.unauthorized(req,"User not logged in");
 
         }
+
         User user = sessionManager.getSessionIdMap().get(uuid).getUser();
         String booksToDisplay = user.borrowBook(conn, req);
         System.out.println(booksToDisplay);
 
-        return "";
+        return booksToDisplay;
+    }
+
+    public static String returnBook(Request req, Connection conn, SessionManager sessionManager) {
+
+        UUID uuid = req.getUserId();
+        System.out.println("BooksHandler(returnBook invoked for userId: " + uuid);
+
+        if (uuid == null) {
+
+            System.out.println("User ID is null — possibly not logged in or missing session.");
+            return Response.unauthorized(req,"User not logged in");
+
+        }
+
+        User user = sessionManager.getSessionIdMap().get(uuid).getUser();
+        String booksToDisplay = user.returnBook(conn, req);
+        System.out.println(booksToDisplay);
+
+        return booksToDisplay;
     }
 
 

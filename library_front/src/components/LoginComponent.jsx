@@ -7,6 +7,14 @@ function LoginComponent() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState(false);
+    const [process, setProcess] = useState("login") // "register" is second option
+
+    // for registering:
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [age, setAge] = useState("");
+    const [password2, setPassword2] = useState("");
+
     const navigator = useNavigate();
     
     useEffect(() => {
@@ -16,13 +24,11 @@ function LoginComponent() {
         
     }, []);
 
-
-
     const navigate = useNavigate();
 
-    async function handlelogin() {
+    function handlelogin() {
 
-        await fetch("http://localhost:9000/login", {
+        fetch("http://localhost:9000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: 'include',
@@ -43,6 +49,18 @@ function LoginComponent() {
         });   
     }
 
+    function handleRegister() {
+      if (password === password2) {
+
+        fetch("http://localhost:9000/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include',
+          body: JSON.stringify({ firstName, lastName, age, email, password }),
+        }).then()
+        
+      }
+    }
     return (
 
 <div className="bg-white w-[90vw] max-w-md h-auto rounded-2xl shadow-xl flex flex-col items-center p-8 md:p-12">
@@ -51,26 +69,73 @@ function LoginComponent() {
     Library Management System
   </h1>
 
-  <div className="mt-10 flex flex-col w-full gap-y-6">
+  <div className="mt-10 flex flex-col w-full gap-y-4 overflow-auto no-scrollbar">
+    {process === "register" && 
+    <>
+
+    <input
+      type="text"
+      placeholder="First name"
+      className="border-2 rounded-md w-full h-5 py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      value={firstName}
+      onChange={(e) => setFirstName(e.target.value)}
+    />
+    <input
+      type="text"
+      placeholder="Last name"
+      className="border-2 rounded-md w-full h-5 py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      value={lastName}
+      onChange={(e) => setLastName(e.target.value)}
+    />
+
+    <input
+      type="text"
+      placeholder="Age"
+      className="border-2 rounded-md w-full h-5 py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      value={age}
+      onChange={(e) => setAge(e.target.value)}
+    />
+
+    </>
+    
+    }
     <input
       type="text"
       placeholder="Email"
-      className="border-2 rounded-md w-full py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      className="border-2 rounded-md w-full h-5 py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
       value={email}
       onChange={(e) => setEmail(e.target.value)}
     />
     <input
       type="password"
       placeholder="Password"
-      className="border-2 rounded-md w-full py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      className="border-2 rounded-md w-full h-5 py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
       value={password}
       onChange={(e) => setPassword(e.target.value)}
     />
+    {process === "register" && 
+
+    <input
+      type="password"
+      placeholder="Repeat password"
+      className="border-2 rounded-md w-full h-5 py-4 px-3 text-lg focus:outline-none focus:border-blue-400"
+      value={password2}
+      onChange={(e) => setPassword2(e.target.value)}
+    />
+
+    }
+
     <button
       className="rounded-md w-full py-4 text-xl bg-blue-500 hover:bg-blue-600 transition-colors text-white"
-      onClick={handlelogin}
+      onClick={() => {
+      if (process === "login") {
+          handlelogin()
+      } else {
+          handleRegister()
+      }
+      }}
     >
-      Login
+      {process === "login" ? "Login" : "Register"}
     </button>
 
     {loginError && (
@@ -80,8 +145,14 @@ function LoginComponent() {
 
   <div className="bg-gray-300 w-full h-[1px] mt-10"></div>
 
-  <button className="mt-6 rounded-md w-full py-4 text-xl bg-green-600 hover:bg-green-700 transition-colors text-white">
-    Create new account
+  <button className="mt-6 rounded-md w-full py-4 text-xl bg-green-600 hover:bg-green-700 transition-colors text-white" onClick={() => {
+      if (process === "login") {
+          setProcess("register")
+      } else {
+          setProcess("login")
+      }
+      }}>
+    {process === "login" ? "Create new account" : "Log in"}
   </button>
 </div>
 

@@ -2,6 +2,8 @@ package classes;
 
 import classes.users.Reader;
 import classes.users.User;
+import server.Request;
+import server.Response;
 import utils.JsonUtils;
 import utils.PasswordUtils;
 
@@ -12,12 +14,13 @@ import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Library {
 
     private final String name;
-
-
     public Library(String name) {
         this.name = name;
     }
@@ -122,19 +125,37 @@ public class Library {
 
     }
 
-    public static void createReader(Connection conn, String firstName, String lastName, int age, String email, String password) {
+    public static String createReader(Connection conn, Request request) {
+
+        Pattern emailPattern = Pattern.compile(".+@.+[.][^.]+");
+        Pattern name = Pattern.compile("^[A-Z][a-zA-Z]*$");
+        var body = request.getBody();
+
+        Map<String, String> data = JsonUtils.createMapFromJson(body);
 
         try {
             String sql = "INSERT INTO users (firstName, lastName, age, role, email, password_hash)" +
                     "VALUES (?, ?, ?, ?, ?,  ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
-            ps.setString(1, firstName);
-            ps.setString(2, lastName);
-            ps.setInt(3, age);
+
+            if (!name.matcher(data.get("firstName")).matches()) {
+                return Response.registerFailure(request, "Wrong first name");
+            }
+            if (!name.matcher(data.get("lastName")).matches()) {
+                return Response.registerFailure(request, "Wrong last name");
+            }
+            if (Integer.parseInt(data.get("age")) < 10 || Integer.parseInt(data.get("age")) > 120) {
+                return Response.registerFailure(request, "Age must be between 10 and 120");
+            }
+
+            ps.setString(1, data.get("firstName"));
+            ps.setString(2, data.get("lastName"));
+            ps.setInt(3, Integer.parseInt(data.get("age")));
             ps.setString(4, "READER");
-            ps.setString(5, email);
-            ps.setString(6, PasswordUtils.hashPassword(password));
+            ps.setString(5, data.get("email"));
+            ps.setString(6, PasswordUtils.hashPassword(data.get("password")));
             ps.executeUpdate();
+
         } catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
