@@ -83,19 +83,6 @@ public class Response {
 
     }
 
-    public static String unsuccessfulLogin(Request request) {
-
-        String body = "{\"status\":\"failure\",\"message\":\"Invalid email or password.\"}";
-        int length = body.getBytes(StandardCharsets.UTF_8).length;
-
-        return "HTTP/1.1 401 Unauthorized\r\n" +
-                corsHeaders(request) +
-                "Connection: close\r\n" +
-                "Content-Length: " + length + "\r\n" +
-                "\r\n" +
-                body;
-
-    }
 
     public static String logout(Request request) {
 

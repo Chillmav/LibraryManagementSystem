@@ -6,7 +6,7 @@ function LoginComponent() {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [loginError, setLoginError] = useState(false);
+    const [loginError, setLoginError] = useState("");
     const [process, setProcess] = useState("login") // "register" is second option
     const [registerMessage, setRegisterMessage] = useState("");
     const [registerStatus, setRegisterStatus] = useState("");
@@ -40,12 +40,14 @@ function LoginComponent() {
             console.log(data);
             if (data.status === "success") {
             navigate("panel");
+            } else if (data.status === "failure") {
+              setLoginError(data.message);
             } else {
-            setLoginError(true);
+              setLoginError("something happened.");
             }
         })
         .catch(err => {
-            setLoginError(true);
+            setLoginError("Server isn't responding.");
             console.error(err);
         });   
     }
@@ -143,7 +145,7 @@ function LoginComponent() {
     }
 
     <button
-      className="rounded-md w-full py-4 text-xl bg-blue-500 hover:bg-blue-600 transition-colors text-white"
+      className="rounded-md w-full py-4 text-xl bg-blue-500 hover:bg-blue-600 transition-colors text-white cursor-pointer"
       onClick={() => {
       if (process === "login") {
           handlelogin()
@@ -155,8 +157,9 @@ function LoginComponent() {
       {process === "login" ? "Login" : "Register"}
     </button>
 
+    
     {loginError && (
-      <p className="text-lg text-red-500 text-center">Something went wrong, try again.</p>
+      <p className="text-lg text-red-500 text-center">{loginError}</p>
     )}
     {registerMessage.length > 0 && (
       <p className={registerStatus == "Failure" ? "text-lg text-red-500 text-center" : "text-lg text-green-500 text-center"}>{registerMessage}</p>
@@ -165,7 +168,7 @@ function LoginComponent() {
 
   <div className="bg-gray-300 w-full h-[1px] mt-10"></div>
 
-  <button className="mt-6 rounded-md w-full py-4 text-xl bg-green-600 hover:bg-green-700 transition-colors text-white" onClick={() => {
+  <button className="mt-6 rounded-md w-full py-4 text-xl bg-green-600 hover:bg-green-700 transition-colors text-white cursor-pointer" onClick={() => {
       if (process === "login") {
           setProcess("register")
       } else {
