@@ -44,8 +44,9 @@ public class UserHandler {
     }
 
     public static String handleRegister(Request req, Connection conn) {
-        String body = req.getBody();
-        return "";
+
+        return Library.createReader(conn, req);
+
     }
 
     public static String handleLogout(Request req, Connection conn) {

@@ -7,6 +7,7 @@ import server.Response;
 import utils.JsonUtils;
 import utils.PasswordUtils;
 
+import javax.mail.Session;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -134,6 +135,7 @@ public class Library {
         Map<String, String> data = JsonUtils.createMapFromJson(body);
 
         try {
+
             String sql = "INSERT INTO users (firstName, lastName, age, role, email, password_hash)" +
                     "VALUES (?, ?, ?, ?, ?,  ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
@@ -147,6 +149,12 @@ public class Library {
             if (Integer.parseInt(data.get("age")) < 10 || Integer.parseInt(data.get("age")) > 120) {
                 return Response.registerFailure(request, "Age must be between 10 and 120");
             }
+            if (!emailPattern.matcher(data.get("email")).matches()) {
+                return Response.registerFailure(request, "Wrong email");
+            }
+            if (data.get("password").length() < 8) {
+                return Response.registerFailure(request, "Password has to contain at least 8 chars");
+            }
 
             ps.setString(1, data.get("firstName"));
             ps.setString(2, data.get("lastName"));
@@ -156,9 +164,14 @@ public class Library {
             ps.setString(6, PasswordUtils.hashPassword(data.get("password")));
             ps.executeUpdate();
 
+            java.util.Properties props = new java.util.Properties();
+            props.put("mail.smtp.host", "smtp.myisp.com");
+            return Response.registerSuccess(request, "Success! We sent you an email, in order to confirm your account!");
         } catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
+
+
 
 
     }
@@ -167,7 +180,7 @@ public class Library {
 
         try {
 
-            String sql = "SELECT password_hash, firstName, lastName, role, id " +
+            String sql = "SELECT password_hash, firstName, lastName, role, id, isConfirmed " +
                     "FROM users " +
                     "WHERE email=?;";
 
@@ -176,6 +189,10 @@ public class Library {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                if (!rs.getBoolean(6)) {
+                    System.out.println("User`s account isn`t activated");
+                    return null;
+                }
                 if (PasswordUtils.verifyPassword(password, rs.getString(1))) {
                     return new User(rs.getInt(5), Role.valueOf(rs.getString(4)), rs.getString(2), rs.getString(3));
                 } else {

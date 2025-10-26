@@ -8,7 +8,8 @@ function LoginComponent() {
     const [password, setPassword] = useState("");
     const [loginError, setLoginError] = useState(false);
     const [process, setProcess] = useState("login") // "register" is second option
-
+    const [registerMessage, setRegisterMessage] = useState("");
+    const [registerStatus, setRegisterStatus] = useState("");
     // for registering:
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -57,8 +58,24 @@ function LoginComponent() {
           headers: { "Content-Type": "application/json" },
           credentials: 'include',
           body: JSON.stringify({ firstName, lastName, age, email, password }),
-        }).then()
+        }).then(res => res.json()).then(data => {
+
+          if (data.status == "Success") {
+            setRegisterStatus("Success")
+            setRegisterMessage(data.message);
+            setTimeout(() => {
+              setProcess("login");
+            }, 2000)
+          } else if (data.status == "Failure") {
+            setRegisterStatus("Failure")
+            setRegisterMessage(data.message)
+          }
+
+        })
         
+      } else {
+        setRegisterStatus("Failure")
+        setRegisterMessage("Passwords don't match")
       }
     }
     return (
@@ -140,6 +157,9 @@ function LoginComponent() {
 
     {loginError && (
       <p className="text-lg text-red-500 text-center">Something went wrong, try again.</p>
+    )}
+    {registerMessage.length > 0 && (
+      <p className={registerStatus == "Failure" ? "text-lg text-red-500 text-center" : "text-lg text-green-500 text-center"}>{registerMessage}</p>
     )}
   </div>
 
