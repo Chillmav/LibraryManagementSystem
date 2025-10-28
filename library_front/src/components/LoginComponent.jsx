@@ -2,7 +2,7 @@ import {useEffect, useState} from 'react';
 import { useNavigate } from 'react-router-dom';
 import handlelogout from '../utils/handleLogout';
 
-function LoginComponent() {
+function LoginComponent({ role, setRole }) {
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -21,14 +21,20 @@ function LoginComponent() {
     useEffect(() => {
 
         handlelogout(navigator);
+        setRole("");
         setLoginError(false);
         
     }, []);
+
+    useEffect(() => {
+
+    })
 
     const navigate = useNavigate();
 
     function handlelogin() {
 
+        localStorage.clear();
         fetch("http://localhost:9000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -39,7 +45,14 @@ function LoginComponent() {
         .then(data => {
             console.log(data);
             if (data.status === "success") {
-            navigate("panel");
+              if (data.role === "Employee") {
+                  setRole("Employee");
+                  localStorage.setItem("role", "Employee");
+              } else {
+                setRole("Reader");
+                localStorage.setItem("role", "Reader");
+              }
+              navigate("panel");
             } else if (data.status === "failure") {
               setLoginError(data.message);
             } else {

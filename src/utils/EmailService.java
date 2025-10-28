@@ -11,7 +11,7 @@ public class EmailService {
     public static void sendConfirmationEmail(String recipient, String confirmationLink) {
 
         final String fromEmail = "jakub.kulig2004@gmail.com";
-        final String password = "haslodb";
+        final String password = "subt puhe cfsw czdg";
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

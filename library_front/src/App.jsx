@@ -7,7 +7,7 @@ import Panel from './pages/Panel.jsx';
 
 function App() {
 
-  const [username] = useState("");
+  const [role, setRole] = useState("");
   const [books] = useState([]);
 
   return (
@@ -21,8 +21,8 @@ function App() {
       }} className='flex justify-center items-center relative'>
         
       <Routes>
-        <Route path="/" element={<LoginComponent />} />
-        <Route path="/panel" element={<Panel username = {username} books = {books}/>} />
+        <Route path="/" element={<LoginComponent role={role} setRole={setRole}/>} />
+        <Route path="/panel" element={<Panel role = {role} books = {books} setRole={setRole}/>} />
       </Routes>
 
       </div>

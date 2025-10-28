@@ -1,6 +1,7 @@
 package server;
 
 import classes.Library;
+import classes.Role;
 import classes.users.User;
 import handlers.UserHandler;
 import utils.SessionResult;
@@ -41,9 +42,17 @@ public class SessionManager {
         } else {
 
             UUID uuid1 = UUID.randomUUID();
-            UserSession us = new UserSession(user, Duration.of(300, ChronoUnit.SECONDS));
-            sessionIdMap.put(uuid1, us);
-            return new SessionResult(us, uuid1);
+            if (user.getRole() == Role.READER) {
+                UserSession us = new UserSession(user, Duration.of(300, ChronoUnit.SECONDS));
+                sessionIdMap.put(uuid1, us);
+                return new SessionResult(us, uuid1);
+            } else {
+                UserSession us = new UserSession(user, Duration.of(3600, ChronoUnit.SECONDS));
+                sessionIdMap.put(uuid1, us);
+                return new SessionResult(us, uuid1);
+            }
+
+
 
         }
 

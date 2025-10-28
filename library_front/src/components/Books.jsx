@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { TiPlus, TiMinus } from "react-icons/ti";
 
-function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBooks, fetchAllBooks}) {
+function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBooks, fetchAllBooks, role, setRole }) {
 
     const color1 = "bg-yellow-100";
     const color2 = "bg-yellow-300";
 
+
+    useEffect(() => {
+        setRole(localStorage.getItem("role"));
+    }, [])
 
     async function returnBook(bookId) {
 
@@ -67,7 +71,9 @@ function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBook
 
                 <button className={`${booksOption === "all" ? color2 : color1} py-2 px-4 rounded-tl-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={booksOption === "all"} onClick={() => setBooksOption("all")}>Library books</button>
 
-                <button className={`${booksOption === "all" ? color1 : color2} py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={booksOption === "user"} onClick={() => setBooksOption("user")}>Your books</button>
+                { role === "Reader" ? <button className={`${booksOption === "all" ? color1 : color2} py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={booksOption === "user"} onClick={() => setBooksOption("user")}>Your books</button> :
+                <button className={`bg-amber-500 py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={role === "Reader"} onClick={() => console.log("TODO")}>Add Book</button>}
+                
 
             </div>
 

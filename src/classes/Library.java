@@ -9,7 +9,6 @@ import utils.JsonUtils;
 import utils.PasswordUtils;
 import utils.UserVerification;
 
-import javax.mail.Session;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
@@ -158,6 +157,20 @@ public class Library {
             if (data.get("password").length() < 8) {
                 return Response.registerFailure(request, "Password has to contain at least 8 chars");
             }
+            try (PreparedStatement psCheck = conn.prepareStatement("SELECT * FROM users WHERE email = ?")) {
+
+                psCheck.setString(1, data.get("email"));
+
+                var rs = psCheck.executeQuery();
+
+                if (rs.next()) {
+                    return Response.registerFailure(request, "Email aready in use");
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
 
             ps.setString(1, data.get("firstName"));
             ps.setString(2, data.get("lastName"));

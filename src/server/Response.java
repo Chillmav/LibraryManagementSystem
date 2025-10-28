@@ -29,7 +29,7 @@ public class Response {
                     "Content-Length: 0\r\n" +
                     "\r\n";
 
-        } else if (method.equalsIgnoreCase("POST")) {
+        } else {
 
             String body = "{\"message\":\"" + message + "\"}";
             int content_length = body.getBytes(StandardCharsets.UTF_8).length;
@@ -40,8 +40,6 @@ public class Response {
                     "\r\n" +
                     body;
 
-        } else {
-            return "";
         }
     }
 
@@ -68,7 +66,24 @@ public class Response {
 
     public static String successfulLogin(Request request, UUID sessionId) {
 
-        String body = "{\"status\":\"success\",\"message\":\"Login successful!\"}";
+        String body = "{\"status\":\"success\",\"message\":\"Login successful!\",\"role\":\"Reader\"}";
+        int length = body.getBytes(StandardCharsets.UTF_8).length;
+
+        return "HTTP/1.1 200 OK\r\n" +
+                corsHeaders(request) +
+                "Set-Cookie: SESSIONID=" + sessionId.toString() +
+                "; Path=/; HttpOnly; SameSite=None; Secure\r\n"
+                +
+                "Connection: close\r\n" +
+                "Content-Length: " + length + "\r\n" +
+                "\r\n" +
+                body;
+
+    }
+
+    public static String successfulLogin(Request request, UUID sessionId, String role) {
+
+        String body = "{\"status\":\"success\",\"message\":\"Login successful!\",\"role\":\"%s\"}".formatted(role);
         int length = body.getBytes(StandardCharsets.UTF_8).length;
 
         return "HTTP/1.1 200 OK\r\n" +

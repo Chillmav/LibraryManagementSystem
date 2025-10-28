@@ -1,6 +1,7 @@
 package handlers;
 
 import classes.Library;
+import classes.Role;
 import classes.users.Reader;
 import classes.users.User;
 import server.Request;
@@ -26,10 +27,16 @@ public class BooksHandler {
         }
 
         User user = sessionManager.getSessionIdMap().get(uuid).getUser();
-        String booksToDisplay = user.borrowBook(conn, req);
-        System.out.println(booksToDisplay);
+        if (user.getRole() == Role.READER) {
+            String booksToDisplay = user.borrowBook(conn, req);
+            System.out.println(booksToDisplay);
+            return booksToDisplay;
+        } else {
+            return Response.getResponse(req, "400", "Employee can't borrow books");
+        }
 
-        return booksToDisplay;
+
+
     }
 
     public static String returnBook(Request req, Connection conn, SessionManager sessionManager) {

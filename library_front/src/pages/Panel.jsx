@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import handleLogout from "../utils/handleLogout.js";
 import secondsToMin from "../utils/secondsToMin.js";
 
-function Panel() {
+function Panel({ role, setRole }) {
     
     const [booksOption, setBooksOption] = useState("all"); // user is second choice
     const [page, setPage] = useState(1);
@@ -12,7 +12,9 @@ function Panel() {
     const [sessionTime, setSessionTime] = useState(0);
     const navigator = useNavigate();
 
-
+    useEffect(() => {
+        setRole(localStorage.getItem("role"));
+    }, [])
     function fetchAllBooks() { 
 
         fetch("http://localhost:9000/library_books", {
@@ -21,7 +23,7 @@ function Panel() {
                 credentials: "include", 
                 }).then(res => res.json()).then(data => {
                     setBooks(data)
-                    console.log(data)}).catch(error => {console.error(error); handleLogout(navigator)});
+                    console.log(data)}).catch(error => {console.error(error); handleLogout(navigator); setRole("");});
 
     }
 
@@ -33,10 +35,10 @@ function Panel() {
                 credentials: "include", 
                 }).then(res => res.json()).then(data => {
                     setBooks(data)
-                    console.log(data)}).catch(error => {console.error(error); handleLogout(navigator)});
+                    console.log(data)}).catch(error => {console.error(error); handleLogout(navigator); setRole("");});
 
     }
-
+    
     useEffect(() => {
 
         const interval = setInterval(() => {
@@ -69,11 +71,12 @@ function Panel() {
             method: "GET",
             headers: { "Content-Type": "application/json" },
             credentials: "include", 
-        }).then(res => res.json()).then(data => {setSessionTime(data.message); console.log(data); if (data.message == "0") {alert("Session Expired")}}).catch(error => {console.error(error); navigator("/")});
+        }).then(res => res.json()).then(data => {setSessionTime(data.message); console.log(data); if (data.message == "0") {alert("Session Expired")}}).catch(error => {console.error(error); navigator("/"); setRole(""); });
 
     }, [])
 
     return (
+        role === "Reader" ? 
 <>
     <div className="absolute top-2 left-2 w-[12vw] h-10 bg-white flex items-center justify-center gap-x-2 rounded-2xl">Session time: <p className={sessionTime > 150 ? "text-green-500 font-semibold" : "text-red-500 font-semibold"}>{secondsToMin(sessionTime)}</p></div>
     <div className="bg-white w-[60vw] h-[70vh] rounded-2xl shadow-xl flex  flex-col absolute">
@@ -81,24 +84,52 @@ function Panel() {
         <div className="flex justify-between mx-15">
 
             <div className="flex bg-blue-300 relative w-40 p-3 rounded-2xl mt-5 mb-5 justify-center">
-                <p className="text-xl">Hello reader!</p>
+                <p className="text-xl">Hello {role}!</p>
             </div>
 
             <div className="flex bg-lime-500 relative w-40 p-3 rounded-2xl mt-5 mb-5 justify-center">
-                <p className="text-xl">Reader Panel</p>
+                <p className="text-xl">{role} Panel</p>
             </div>
 
-            <button className="flex bg-red-500 relative w-40 p-3 rounded-2xl mt-5 mb-5 justify-center" onClick={() => handleLogout(navigator)}>
+            <button className="flex bg-red-500 relative w-40 p-3 rounded-2xl mt-5 mb-5 justify-center" onClick={() => {handleLogout(navigator); setRole("");}}>
                 <p className="text-xl">Logout</p>
             </button>
         
         </div>
 
-        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books} fetchAllBooks={fetchAllBooks} fetchUserBooks={fetchUserBooks}>
+        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books} fetchAllBooks={fetchAllBooks} fetchUserBooks={fetchUserBooks} setRole={setRole}>
 
         </Books>
         
     </div>
+</> : 
+<>
+    <div className="absolute top-2 left-2 w-[12vw] h-10 bg-white flex items-center justify-center gap-x-2 rounded-2xl">Session time: <p className={sessionTime > 150 ? "text-green-500 font-semibold" : "text-red-500 font-semibold"}>{secondsToMin(sessionTime)}</p></div>
+        
+        <div className="bg-white w-[60vw] h-[70vh] rounded-2xl shadow-xl flex  flex-col absolute">
+        
+        <div className="flex justify-between mx-15">
+
+            <div className="flex bg-blue-300 relative w-50 p-3 rounded-2xl mt-5 mb-5 justify-center">
+                <p className="text-xl">Hello {role}!</p>
+            </div>
+
+            <div className="flex bg-lime-500 relative w-50 p-3 rounded-2xl mt-5 mb-5 justify-center">
+                <p className="text-xl">{role} Panel</p>
+            </div>
+
+            <button className="flex bg-red-500 relative w-50 p-3 rounded-2xl mt-5 mb-5 justify-center" onClick={() => {handleLogout(navigator); setRole("");}}>
+                <p className="text-xl">Logout</p>
+            </button>
+        
+        </div>
+
+        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books} fetchAllBooks={fetchAllBooks} fetchUserBooks={fetchUserBooks} role={role} setRole={setRole}>
+
+        </Books>
+        
+    </div>
+
 </>
     );
 

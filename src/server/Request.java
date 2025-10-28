@@ -1,9 +1,13 @@
 package server;
 
 import classes.users.Reader;
+import utils.PathMethodParams;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class Request {
@@ -14,6 +18,7 @@ public class Request {
     private String body;
     private UUID userId;
     private String hostAdress;
+    private Map<String, String> queryParams;
     public String getHostAddress() {
         return hostAdress;
     }
@@ -26,7 +31,7 @@ public class Request {
 
             if(status) {
 
-                String[] methodAndPath = extractMethodAndPath(reader);
+                PathMethodParams methodPathQueryParams = extractMethodPathQueryParams(reader);
                 String[] headersAndBody = extractHeadersBodyAndCookies(reader);
                 String userIdStr = headersAndBody[2];
                 if (userIdStr != null && !userIdStr.isEmpty()) {
@@ -35,8 +40,9 @@ public class Request {
                     this.userId = null; // no session yet
                 }
 
-                this.method = methodAndPath[0];
-                this.path = methodAndPath[1];
+                this.method = methodPathQueryParams.method();
+                this.path = methodPathQueryParams.path();
+                this.queryParams = methodPathQueryParams.queryParams();
                 this.headers = headersAndBody[0];
                 this.body = headersAndBody[1];
                 this.hostAdress = headersAndBody[3];
@@ -95,12 +101,29 @@ public class Request {
         return new String[]{String.valueOf(headers), String.valueOf(bodyChars), userId, hostAdress};
     }
 
-    private String[] extractMethodAndPath(BufferedReader reader) throws IOException{
+    private PathMethodParams extractMethodPathQueryParams(BufferedReader reader) throws IOException{
 
         String firstLine = reader.readLine();
         String[] parts = firstLine.split(" ");
+        String path = "";
+        Map<String, String> queryParams = new HashMap<>();
 
-        return new String[]{parts[0], parts.length > 1 ? parts[1] : "/"};
+        if (parts[1].contains("?")) {
+            path = parts[1].substring(0, parts[1].indexOf("?"));
+            String[] params = parts[1].substring(parts[1].indexOf("?") + 1).split("&");
+            for (var param : params) {
+
+                String[] keyValue = param.split("=", 2);
+                if (keyValue.length > 2) {
+                    throw new RuntimeException("Wrong http request");
+                }
+                queryParams.put(keyValue[0], keyValue[1]);
+
+            }
+        } else {
+            path = parts[1];
+        }
+        return new PathMethodParams(parts[0], parts.length > 1 ? path : "/", queryParams);
     }
 
     private boolean checkReader(BufferedReader reader) throws IOException {
@@ -133,6 +156,9 @@ public class Request {
         return body;
     }
 
+    public Map<String, String> getQueryParams() {
+        return queryParams;
+    }
     public UUID getUserId() {return userId;}
 
 
