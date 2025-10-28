@@ -4,8 +4,10 @@ import classes.users.Reader;
 import classes.users.User;
 import server.Request;
 import server.Response;
+import utils.EmailService;
 import utils.JsonUtils;
 import utils.PasswordUtils;
+import utils.UserVerification;
 
 import javax.mail.Session;
 import java.security.NoSuchAlgorithmException;
@@ -16,6 +18,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -136,8 +139,8 @@ public class Library {
 
         try {
 
-            String sql = "INSERT INTO users (firstName, lastName, age, role, email, password_hash)" +
-                    "VALUES (?, ?, ?, ?, ?,  ?)";
+            String sql = "INSERT INTO users (firstName, lastName, age, role, email, password_hash, uuid)" +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement ps = conn.prepareStatement(sql);
 
             if (!name.matcher(data.get("firstName")).matches()) {
@@ -162,11 +165,16 @@ public class Library {
             ps.setString(4, "READER");
             ps.setString(5, data.get("email"));
             ps.setString(6, PasswordUtils.hashPassword(data.get("password")));
+
+            String token = UUID.randomUUID().toString();
+            ps.setString(7, token);
             ps.executeUpdate();
 
-            java.util.Properties props = new java.util.Properties();
-            props.put("mail.smtp.host", "smtp.myisp.com");
+            String confirmationLink = "http://localhost:9000/confirm?token=" + token;
+            EmailService.sendConfirmationEmail(data.get("email"), confirmationLink);
+
             return Response.registerSuccess(request, "Success! We sent you an email, in order to confirm your account!");
+
         } catch (SQLException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
@@ -176,7 +184,7 @@ public class Library {
 
     }
 
-    public static User verifyUser(Connection conn, String email, String password) {
+    public static UserVerification verifyUser(Connection conn, String email, String password) {
 
         try {
 
@@ -189,12 +197,15 @@ public class Library {
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                if (!rs.getBoolean(6)) {
-                    System.out.println("User`s account isn`t activated");
-                    return null;
-                }
+
                 if (PasswordUtils.verifyPassword(password, rs.getString(1))) {
-                    return new User(rs.getInt(5), Role.valueOf(rs.getString(4)), rs.getString(2), rs.getString(3));
+
+                    if (!rs.getBoolean(6)) {
+                        System.out.println("User`s account isn`t activated");
+                        return new UserVerification(new User(rs.getInt(5), Role.valueOf(rs.getString(4)), rs.getString(2), rs.getString(3)), false);
+                    }
+
+                    return new UserVerification(new User(rs.getInt(5), Role.valueOf(rs.getString(4)), rs.getString(2), rs.getString(3)), true);
                 } else {
                     System.out.println("Password doesn't match");
                     return null;

@@ -10,5 +10,6 @@ export default function secondsToMin(seconds) {
     if (mins < 10) {
         mins = "0" + mins;
     }
+    
     return mins + " : " + secs;
 }

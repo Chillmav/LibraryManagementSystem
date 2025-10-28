@@ -29,6 +29,7 @@ public class Router {
                 case "/borrow" -> BooksHandler.borrowBook(req, conn, sessionManager);
                 case "/return" -> BooksHandler.returnBook(req, conn, sessionManager);
                 case "/logout" -> UserHandler.handleLogout(req, conn);
+                case "/confirm" -> UserHandler.confirmUser(req, conn);
                 default -> "";
             };
 

@@ -8,6 +8,7 @@ import server.SessionManager;
 import utils.JsonUtils;
 import utils.SessionResult;
 import utils.UserSession;
+import utils.UserVerification;
 
 import java.sql.Connection;
 import java.util.Map;
@@ -25,13 +26,22 @@ public class UserHandler {
 
             String email = accountCredentials.get("email");
             String password = accountCredentials.get("password");
-            User user = Library.verifyUser(conn, email, password);
+            UserVerification userVerification = Library.verifyUser(conn, email, password);
+
+            User user = userVerification.user();
 
             if (user != null) {
-                SessionResult sr = sessionManager.handleSession(req, user);
-                return Response.successfulLogin(req, sr.uuid());
+                if (userVerification.isConfirmed()) {
+                    SessionResult sr = sessionManager.handleSession(req, userVerification.user());
+                    return Response.successfulLogin(req, sr.uuid());
+                } else {
+                    return Response.unauthorized(req, "Confirm your account!");
+                }
+
             } else {
-                return Response.unsuccessfulLogin(req);
+
+                return Response.unauthorized(req, "Credentials don't match to any accounts.");
+
             }
 
 
@@ -49,6 +59,9 @@ public class UserHandler {
 
     }
 
+    public static String confirmUser(Request req, Connection conn) {
+
+    }
     public static String handleLogout(Request req, Connection conn) {
 
         return Response.logout(req);
