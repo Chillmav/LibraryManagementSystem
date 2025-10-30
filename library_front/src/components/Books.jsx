@@ -1,15 +1,57 @@
 import { useEffect, useState } from "react";
 import { TiPlus, TiMinus } from "react-icons/ti";
+import { IoMdCloseCircle } from "react-icons/io";
+
 
 function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBooks, fetchAllBooks, role, setRole }) {
 
     const color1 = "bg-yellow-100";
     const color2 = "bg-yellow-300";
 
+    const [loading, setLoading] = useState(true);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [title, setTitle] = useState("");
+    const [author, setAuthor] = useState("");
+    const [pages, setPages] = useState("");
+    const [kind, setKind] = useState("");
+    const [available, setAvailable] = useState("1");
+
+    async function addBook() {
+    const newBook = { title, author, pages, kind, available: parseInt(available) };
+
+    try {
+        const res = await fetch("http://localhost:9000/addBook", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(newBook),
+        });
+
+        const data = await res.json();
+        if (data.message.toLowerCase() === "success") {
+        alert("Book added successfully!");
+        fetchAllBooks(); // refresh book list
+        setModalVisible(false);
+        } else {
+        alert("Failed to add book");
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Something went wrong");
+    }
+    }
+    useEffect(() => {
+        const storedRole = localStorage.getItem("role");
+        setRole(storedRole);
+        setModalVisible(false);
+    }, []);
 
     useEffect(() => {
-        setRole(localStorage.getItem("role"));
-    }, [])
+        if (role === "Employee" || role === "Reader") {
+            console.log("Role: " + role);
+            setLoading(false);
+        }
+    }, [role]);
 
     async function returnBook(bookId) {
 
@@ -64,15 +106,15 @@ function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBook
     }
 
     return (
-
-        <div className="bg-yellow-200 h-[60vh] rounded-2xl flex flex-col mx-15 mb-5">
+        !loading &&
+        <div className="bg-yellow-200 h-[60vh] rounded-2xl flex flex-col mx-15 mb-5 relative">
 
             <div>
 
                 <button className={`${booksOption === "all" ? color2 : color1} py-2 px-4 rounded-tl-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={booksOption === "all"} onClick={() => setBooksOption("all")}>Library books</button>
 
-                { role === "Reader" ? <button className={`${booksOption === "all" ? color1 : color2} py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={booksOption === "user"} onClick={() => setBooksOption("user")}>Your books</button> :
-                <button className={`bg-amber-500 py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={role === "Reader"} onClick={() => console.log("TODO")}>Add Book</button>}
+                { role === "Reader" ? (<button className={`${booksOption === "all" ? color1 : color2} py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={booksOption === "user"} onClick={() => setBooksOption("user")}>Your books</button>) :
+                (<button className={`bg-amber-500 py-2 px-4 rounded-r-xl border-r-2 shadow-2xs border-b-1 cursor-pointer`} disabled={role === "Reader"} onClick={() => setModalVisible(true)}>Add Book</button>)}
                 
 
             </div>
@@ -95,7 +137,7 @@ function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBook
                                 </div>
                             </div>
                             <div className="flex items-center">
-                                {book.available ? <button className="bg-lime-500 flex items-center justify-center w-fit h-fit p-4 rounded-2xl cursor-pointer" onClick={() => borrowBook(book.id)}><TiPlus size={20}/></button> : <></>}
+                                {(book.available && role === "Reader") ? <button className="bg-lime-500 flex items-center justify-center w-fit h-fit p-4 rounded-2xl cursor-pointer" onClick={() => borrowBook(book.id)}><TiPlus size={20}/></button> : <></>}
                             </div>
                         {(!book.available && booksOption === "user") ?
                             <div className="flex items-center">
@@ -110,9 +152,124 @@ function Books({booksOption, page, setBooksOption, setPage, books, fetchUserBook
             </p>}
             </div>
 
+{modalVisible && (
+  <div
+    className={`absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm transition-opacity duration-300 ${
+      modalVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+    }`}
+  >
+    <div className="modal bg-amber-50 w-[40vw] h-[50vh] rounded-xl shadow-lg p-6 relative flex flex-col justify-between">
+      
+      <IoMdCloseCircle
+        className="top-4 right-4 absolute cursor-pointer"
+        size={30}
+        color="#fb2c36"
+        onClick={() => setModalVisible(false)}
+      />
+
+      <h2 className="text-2xl font-semibold text-center text-amber-700 mb-4">
+        Add New Book
+      </h2>
+    <div className="flex flex-row">
+
+        <div className="flex flex-1 flex-col items-center justify-center w-fit h-fit">
+            <h1>Add book cover</h1>
+            <div className="w-fit h-fit border-2"></div>
         </div>
 
-    );
+      <form
+        className="flex flex-col gap-4 flex-2"
+        onSubmit={(e) => {
+          e.preventDefault();
+          addBook(); 
+        }}
+      >
+
+        <div className="flex flex-col">
+          <label className="text-sm font-semibold text-gray-700">Title</label>
+          <input
+            type="text"
+            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            placeholder="Enter book title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm font-semibold text-gray-700">Author</label>
+          <input
+            type="text"
+            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            placeholder="Enter author name"
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            required
+          />
+        </div>
+
+        <div className="flex flex-col">
+          <label className="text-sm font-semibold text-gray-700">Pages</label>
+          <input
+            type="number"
+            className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+            placeholder="Number of pages"
+            value={pages}
+            onChange={(e) => setPages(e.target.value)}
+            required
+            min="1"
+          />
+        </div>
+
+        <div className="flex flex-col">
+
+          <label className="text-sm font-semibold text-gray-700">Kind</label>
+          <select
+                className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                value={kind}
+                onChange={(e) => setKind(e.target.value)}
+                required
+                >
+                <option value="">Select kind</option>
+                <option value="FICTION">Fiction</option>
+                <option value="NON_FICTION">Non-Fiction</option>
+                <option value="MYSTERY">Mystery</option>
+                <option value="FANTASY">Fantasy</option>
+                <option value="SCIENCE_FICTION">Science Fiction</option>
+                <option value="ROMANCE">Romance</option>
+                <option value="HORROR">Horror</option>
+                <option value="HISTORICAL">Historical</option>
+                <option value="BIOGRAPHY">Biography</option>
+                <option value="SELF_HELP">Self Help</option>
+                <option value="EDUCATIONAL">Educational</option>
+                <option value="POETRY">Poetry</option>
+                <option value="CHILDREN">Children</option>
+                <option value="YOUNG_ADULT">Young Adult</option>
+                <option value="RELIGION">Religion</option>
+                <option value="PHILOSOPHY">Philosophy</option>
+            </select>
+
+        </div>
+
+        <button
+          type="submit"
+          className="mt-4 bg-amber-500 hover:bg-amber-600 text-white font-semibold py-2 rounded-lg transition-all"
+        >
+          Add Book
+        </button>
+
+      </form>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+        </div>
+
+    )
 
 }
 

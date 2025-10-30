@@ -97,7 +97,7 @@ function Panel({ role, setRole }) {
         
         </div>
 
-        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books} fetchAllBooks={fetchAllBooks} fetchUserBooks={fetchUserBooks} setRole={setRole}>
+        <Books page={page} booksOption={booksOption} setPage={setPage} setBooksOption = {setBooksOption} books={books} fetchAllBooks={fetchAllBooks} fetchUserBooks={fetchUserBooks} setRole={setRole} role={role}>
 
         </Books>
         
